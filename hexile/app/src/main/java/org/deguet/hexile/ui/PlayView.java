@@ -37,9 +37,12 @@ public class PlayView extends AbsHexView{
 
     boolean isDone = false;
 
+    double conRatio = 1.0;
+
     public void setHexile(Hexile hexile) {
         this.hexile = hexile;
         this.hexile.shuffle(new Random());
+        conRatio =1.0;
         draw();
     }
 
@@ -58,6 +61,7 @@ public class PlayView extends AbsHexView{
         hexile= new Hexile(numberOfCols, numberOfCols).gen(proba, new Random());
         hexile.shuffle(new Random());
         isDone = false;
+        conRatio =1.0;
     }
 
 
@@ -67,7 +71,8 @@ public class PlayView extends AbsHexView{
     public void drawTile(Canvas c, Tile tile, int col, int row, float sizeCol, float sizeRow){
         float startX = xForCol(col, row, sizeCol);
         float startY = yForRow(col, row, sizeRow);
-        paint.setColor(Consts.hexFillColor());
+        //paint.setColor(Service.interpolateColor(Consts.hexFillColor(),Color.WHITE,conRatio));
+        paint.setColor(Service.interpolateColor(Color.WHITE,Consts.hexFillColor(),conRatio));
         paint.setStyle(Paint.Style.FILL);
         Position[] positions = positions(startX, startY, sizeCol, sizeRow);
         {
@@ -81,12 +86,12 @@ public class PlayView extends AbsHexView{
             path.close();
             c.drawPath(path, paint);
             paint.setStrokeWidth(sizeCol / 20);
-            paint.setColor(Consts.hexBorderColor());
+            paint.setColor(Service.interpolateColor(Color.WHITE,Consts.hexBorderColor(),conRatio));
             //paint.setColor(Color.WHITE);
             paint.setStyle(Paint.Style.STROKE);
             c.drawPath(path, paint);
         }
-        int paintc = Consts.strokeColor();
+        int paintc = Service.interpolateColor(Color.BLACK,Consts.strokeColor(),conRatio);
         //noinspection ResourceAsColor
         paint.setColor(paintc);
         paint.setStrokeWidth(10f);
@@ -140,6 +145,7 @@ public class PlayView extends AbsHexView{
                     || tile.type.positions.length==1){
                 c.drawCircle(startX+sizeCol/2, startY+sizeRow/2, sizeCol /10, paint);
             }
+
         }
     }
 
@@ -175,13 +181,13 @@ public class PlayView extends AbsHexView{
                 //conRatio = 1.0*con/max;
                 draw();
                 if (isDone){
-                    new CountDownTimer(1000, 100) {
+                    new CountDownTimer(2000, 100) {
                         public void onTick(long millisUntilFinished) {
-
+                            conRatio = millisUntilFinished*1.0 / 2000;
+                            draw();
                         }
                         public void onFinish() {
                             Log.i("Hexile","Puzzle is finished, should switch view");
-                            playActivity.switchToCaptureOrNext("");
                             draw();
                         }
                     }.start();
@@ -189,6 +195,24 @@ public class PlayView extends AbsHexView{
             }
         }
         return false;
+    }
+
+    public Bitmap grabAScreen(){
+        SurfaceView v = this;
+        File dir = getContext().getFilesDir();
+        int w = getWidth();
+        int h = getHeight();
+        Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
+        draw();
+        v.draw(c);
+        try {
+            b.compress(
+                    Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(dir,"image.png")));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return b;
     }
 
     public void setPlayActivity(PlayActivity playActivity) {

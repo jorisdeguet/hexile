@@ -86,7 +86,6 @@ public abstract class AbsHexView extends SurfaceView  implements SurfaceHolder.C
                 this.sizeCol = (int) ( width *1.0 / hexile.getCols() );
             }
         }
-        //if (hexile == null)this.changeHexile();
         draw();
     }
 

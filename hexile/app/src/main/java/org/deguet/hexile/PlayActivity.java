@@ -2,6 +2,7 @@ package org.deguet.hexile;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ViewSwitcher;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import org.deguet.hexile.service.Consts;
 import org.deguet.hexile.ui.PlayView;
@@ -38,19 +41,6 @@ public class PlayActivity extends AppCompatActivity {
             hview.draw();
             Log.i("Hexile","onCreate is "+ hview );
         }
-
-        ImageButton bPlay = (ImageButton) findViewById(R.id.bPlay);
-        bPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i("Hexile","Will switch view to ad while playing");
-                hview.changeHexile();
-                hview.draw();
-                ViewSwitcher vs = (ViewSwitcher) findViewById(R.id.viewSwitcher);
-                vs.showPrevious();
-            }
-        });
-
     }
 
     @Override
@@ -59,11 +49,11 @@ public class PlayActivity extends AppCompatActivity {
         super.onPostResume();
     }
 
-    public void switchToCaptureOrNext(String message){
-        //Toast.makeText(getApplicationContext(),"DONE",Toast.LENGTH_LONG).show();
-        Log.i("Hexile","Will switch view to show menu");
-        ViewSwitcher vs = (ViewSwitcher) findViewById(R.id.viewSwitcher);
-        vs.showNext();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.play, menu);
+        return true;
     }
 
 }
